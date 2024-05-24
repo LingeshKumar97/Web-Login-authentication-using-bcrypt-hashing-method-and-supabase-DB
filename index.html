@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth Example</title>
+</head>
+<body>
+  <h1>Register</h1>
+  <form id="registerForm">
+    <input type="email" id="registerEmail" placeholder="Email" required>
+    <input type="password" id="registerPassword" placeholder="Password" required>
+    <button type="submit">Register</button>
+  </form>
+
+  <h1>Login</h1>
+  <form id="loginForm">
+    <input type="email" id="loginEmail" placeholder="Email" required>
+    <input type="password" id="loginPassword" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <h1>Profile</h1>
+  <button id="profileButton">Get Profile</button>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          alert('Registration successful!');
+        } else {
+          alert(`Error: ${data}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to fetch');
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          alert('Login successful!');
+        } else {
+          alert(`Error: ${data}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to fetch');
+      }
+    });
+
+    document.getElementById('profileButton').addEventListener('click', async () => {
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await fetch('http://localhost:3000/profile', {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.text();
+        if (response.ok) {
+          alert(`Profile: ${data}`);
+        } else {
+          alert(`Error: ${data}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to fetch');
+      }
+    });
+  </script>
+</body>
+</html>
